@@ -26,4 +26,5 @@ It is useful for managing server access in organizations where team membership o
 Run this as root:
 
 ```bash
-curl -s https://raw.githubusercontent.com/excloud-in/examples/main/sync-github-sshkeys/install.sh | bash
+curl -s https://raw.githubusercontent.com/excloud-in/examples/main/sync-github-sshkeys/sync-github-sshkeys.sh | bash
+```

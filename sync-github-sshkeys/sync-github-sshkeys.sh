@@ -119,3 +119,5 @@ echo "✅ Cronjob set (hourly)"
 echo "➡️ Running first sync..."
 $SCRIPT_PATH >> $CRON_LOG 2>&1
 echo "✅ First sync done. Check log: $CRON_LOG"
+
+echo "Your GitHub Team Member SSH keys can be used to login to ssh root@server_ip"

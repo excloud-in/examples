@@ -26,5 +26,5 @@ It is useful for managing server access in organizations where team membership o
 Run this as root:
 
 ```bash
-wget https://raw.githubusercontent.com/excloud-in/examples/main/sync-github-sshkeys/sync-github-sshkeys.sh && bash sync-github-sshkeys.sh
+wget -O sync-github-sshkeys.sh https://raw.githubusercontent.com/excloud-in/examples/main/sync-github-sshkeys/sync-github-sshkeys.sh && bash sync-github-sshkeys.sh
 ```

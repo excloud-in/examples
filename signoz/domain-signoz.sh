@@ -13,6 +13,7 @@ if [ -z "$DOMAIN" ]; then
 fi
 
 URL="https://${DOMAIN}"
+INTERNAL_URL="https://internal-${DOMAIN}"
 COMPOSE_FILE="${APP_DIR}/signoz/deploy/docker/docker-compose.yaml"
 
 set_env() {
@@ -32,6 +33,7 @@ set_env() {
 
 set_env "SIGNOZ_GLOBAL_EXTERNAL_URL" "${URL}" ".services.signoz.environment"
 set_env "SIGNOZ_GLOBAL_INGESTION_URL" "${URL}" ".services.signoz.environment"
+set_env "SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL_URL" "${URL}" ".services.signoz.environment"
 
 cat > /etc/caddy/Caddyfile << EOF
 ${URL} {
@@ -43,6 +45,17 @@ ${URL}:4317 {
 }
 
 ${URL}:4318 {
+        reverse_proxy localhost:44318
+}
+${INTERNAL_URL} {
+        reverse_proxy localhost:8080
+}
+
+${INTERNAL_URL}:4317 {
+        reverse_proxy h2c://localhost:44317
+}
+
+${INTERNAL_URL}:4318 {
         reverse_proxy localhost:44318
 }
 EOF

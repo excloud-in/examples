@@ -71,8 +71,9 @@ set_port "127.0.0.1:44317:4317" "$OTEL_SERVICE_PATH"
 set_port "127.0.0.1:44318:4318" "$OTEL_SERVICE_PATH"
 set_port "127.0.0.1:8080:8080" "$SIGNOZ_SERVICE_PATH"
 set_env "SIGNOZ_TOKENIZER_JWT_SECRET" "${JWT_SECRET}" ".services.signoz.environment"
-set_env "SIGNOZ_SQLSTORE_PROVIDER" "${JWT_SECRET}" ".services.signoz.environment"
-set_env "SIGNOZ_SQLSTORE_POSTGRES_DSN" "${POSTGRES_DSN}" ".services.signoz.environment"
+# TODO Add support for postgres DSN
+# set_env "SIGNOZ_SQLSTORE_PROVIDER" "${JWT_SECRET}" ".services.signoz.environment"
+# set_env "SIGNOZ_SQLSTORE_POSTGRES_DSN" "${POSTGRES_DSN}" ".services.signoz.environment"
 
 
 bash "${SCRIPT_DIR}/domain-signoz.sh" "${DOMAIN}"

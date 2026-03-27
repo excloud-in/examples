@@ -34,6 +34,9 @@ mkdir -p "${STATE_DIR}"
 
 if [ -f "${ADMIN_PASSWORD_FILE}" ]; then
   ADMIN_PASSWORD="$(cat "${ADMIN_PASSWORD_FILE}")"
+elif [ -n "${EXC_APP_BOOTSTRAP_ADMIN_PASSWORD:-}" ]; then
+  ADMIN_PASSWORD="${EXC_APP_BOOTSTRAP_ADMIN_PASSWORD}"
+  echo "${ADMIN_PASSWORD}" > "${ADMIN_PASSWORD_FILE}"
 else
   ADMIN_PASSWORD="$(openssl rand -hex 18)"
   echo "${ADMIN_PASSWORD}" > "${ADMIN_PASSWORD_FILE}"

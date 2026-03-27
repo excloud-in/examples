@@ -39,10 +39,16 @@ else
   echo "${ADMIN_PASSWORD}" > "${ADMIN_PASSWORD_FILE}"
 fi
 
-cp "${ERPNEXT_DIR}/pwd.yml" "${STATE_DIR}/pwd.yml.orig"
+git -C "${ERPNEXT_DIR}" show HEAD:pwd.yml > "${STATE_DIR}/pwd.yml.orig"
 cp "${STATE_DIR}/pwd.yml.orig" "${COMPOSE_FILE}"
 
-sed -i "s/admin/${ADMIN_PASSWORD}/g" "${COMPOSE_FILE}"
+sed -i \
+  -e "s/MYSQL_ROOT_PASSWORD: admin/MYSQL_ROOT_PASSWORD: ${ADMIN_PASSWORD}/g" \
+  -e "s/MARIADB_ROOT_PASSWORD: admin/MARIADB_ROOT_PASSWORD: ${ADMIN_PASSWORD}/g" \
+  -e "s/--admin-password=admin/--admin-password=${ADMIN_PASSWORD}/" \
+  -e "s/--db-root-password=admin/--db-root-password=${ADMIN_PASSWORD}/" \
+  -e "s/--password=admin/--password=${ADMIN_PASSWORD}/" \
+  "${COMPOSE_FILE}"
 sed -i "s/\"8080:8080\"/\"127.0.0.1:${APP_UPSTREAM_PORT}:8080\"/" "${COMPOSE_FILE}"
 
 docker compose -f "${COMPOSE_FILE}" up -d

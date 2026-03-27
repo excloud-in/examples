@@ -4,6 +4,7 @@ APP_NAME="signoz"
 APP_DIR="/var/excloud/apps"
 SCRIPT_DIR="/var/excloud/scripts"
 POSTGRES_DSN="postgres://postgres:your_password@localhost:5432/signoz?sslmode=disable"
+APP_UPSTREAM_PORT="${EXC_APP_UPSTREAM_PORT:-8080}"
 mkdir -p "${APP_DIR}"
 mkdir -p "${SCRIPT_DIR}"
 
@@ -69,7 +70,7 @@ set_env() {
 
 set_port "127.0.0.1:44317:4317" "$OTEL_SERVICE_PATH"
 set_port "127.0.0.1:44318:4318" "$OTEL_SERVICE_PATH"
-set_port "127.0.0.1:8080:8080" "$SIGNOZ_SERVICE_PATH"
+set_port "127.0.0.1:${APP_UPSTREAM_PORT}:8080" "$SIGNOZ_SERVICE_PATH"
 set_env "SIGNOZ_TOKENIZER_JWT_SECRET" "${JWT_SECRET}" ".services.signoz.environment"
 # TODO Add support for postgres DSN
 # set_env "SIGNOZ_SQLSTORE_PROVIDER" "${JWT_SECRET}" ".services.signoz.environment"

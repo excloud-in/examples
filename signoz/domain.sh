@@ -3,6 +3,7 @@
 APP_NAME="signoz"
 APP_DIR="/var/excloud/apps"
 SCRIPT_DIR="/var/excloud/scripts"
+APP_UPSTREAM_PORT="${EXC_APP_UPSTREAM_PORT:-8080}"
 
 DOMAIN="${1}"
 
@@ -37,7 +38,7 @@ set_env "SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL_URL" "${URL}" ".services.signoz.env
 
 cat > /etc/caddy/Caddyfile << EOF
 ${URL} {
-        reverse_proxy localhost:8080
+        reverse_proxy localhost:${APP_UPSTREAM_PORT}
 }
 
 ${URL}:4317 {
@@ -47,17 +48,17 @@ ${URL}:4317 {
 ${URL}:4318 {
         reverse_proxy localhost:44318
 }
-${INTERNAL_URL} {
-        reverse_proxy localhost:8080
-}
-
-${INTERNAL_URL}:4317 {
-        reverse_proxy h2c://localhost:44317
-}
-
-${INTERNAL_URL}:4318 {
-        reverse_proxy localhost:44318
-}
+# ${INTERNAL_URL} {
+#         reverse_proxy localhost:${APP_UPSTREAM_PORT}
+# }
+#
+# ${INTERNAL_URL}:4317 {
+#         reverse_proxy h2c://localhost:44317
+# }
+#
+# ${INTERNAL_URL}:4318 {
+#         reverse_proxy localhost:44318
+# }
 EOF
 
 echo "Caddyfile updated"

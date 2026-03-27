@@ -11,7 +11,7 @@ DOMAIN="${1}"
 
 if [ -z "$DOMAIN" ]; then
   echo "Error: URL argument is required. Example:" >&2
-  echo "install-signoz.sh sub.example.com" >&2
+  echo "install.sh sub.example.com" >&2
   exit 1
 fi
 
@@ -76,4 +76,4 @@ set_env "SIGNOZ_TOKENIZER_JWT_SECRET" "${JWT_SECRET}" ".services.signoz.environm
 # set_env "SIGNOZ_SQLSTORE_POSTGRES_DSN" "${POSTGRES_DSN}" ".services.signoz.environment"
 
 
-bash "${SCRIPT_DIR}/domain-signoz.sh" "${DOMAIN}"
+bash "${SCRIPT_DIR}/domain.sh" "${DOMAIN}"

@@ -8,7 +8,7 @@ DOMAIN="${1}"
 
 if [ -z "$DOMAIN" ]; then
   echo "Error: URL argument is required. Example:" >&2
-  echo "domain-change.sh sub.example.com" >&2
+  echo "domain.sh sub.example.com" >&2
   exit 1
 fi
 

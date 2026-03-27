@@ -38,26 +38,26 @@ set_env "SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL_URL" "${URL}" ".services.signoz.env
 
 cat > /etc/caddy/Caddyfile << EOF
 ${URL} {
-        reverse_proxy localhost:${APP_UPSTREAM_PORT}
+        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
 }
 
 ${URL}:4317 {
-        reverse_proxy h2c://localhost:44317
+        reverse_proxy h2c://127.0.0.1:44317
 }
 
 ${URL}:4318 {
-        reverse_proxy localhost:44318
+        reverse_proxy 127.0.0.1:44318
 }
 # ${INTERNAL_URL} {
-#         reverse_proxy localhost:${APP_UPSTREAM_PORT}
+#         reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
 # }
 #
 # ${INTERNAL_URL}:4317 {
-#         reverse_proxy h2c://localhost:44317
+#         reverse_proxy h2c://127.0.0.1:44317
 # }
 #
 # ${INTERNAL_URL}:4318 {
-#         reverse_proxy localhost:44318
+#         reverse_proxy 127.0.0.1:44318
 # }
 EOF
 

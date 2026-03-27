@@ -17,14 +17,16 @@ if [ -z "$DOMAIN" ]; then
 fi
 
 JWT_SECRET=$(openssl rand -hex 16 | cut -c-32)
-
-if [ -f "${APP_DIR}/jwt-secret" ]; then
-    JWT_SECRET=$(cat ${APP_DIR}/jwt-secret)
-else
-    echo $JWT_SECRET > ${APP_DIR}/jwt-secret
-fi
-
 SIGNOZ_DIR="${APP_DIR}/signoz"
+JWT_SECRET_FILE="${SIGNOZ_DIR}/jwt-secret"
+
+mkdir -p "${SIGNOZ_DIR}"
+
+if [ -f "${JWT_SECRET_FILE}" ]; then
+    JWT_SECRET=$(cat "${JWT_SECRET_FILE}")
+else
+    echo "${JWT_SECRET}" > "${JWT_SECRET_FILE}"
+fi
 COMPOSE_FILE="${SIGNOZ_DIR}/deploy/docker/docker-compose.yaml"
 OTEL_SERVICE_PATH='.services["otel-collector"].ports'
 SIGNOZ_SERVICE_PATH=".services.signoz.ports"

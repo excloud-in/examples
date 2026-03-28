@@ -23,6 +23,7 @@ fi
 
 SECRET_KEY_BASE="$(tr -d '\n' < "${SECRET_KEY_FILE}")"
 
+# Always rewrite .env with current domain
 cat > "${ENV_FILE}" <<EOF
 BASE_URL=https://${DOMAIN}
 SECRET_KEY_BASE=${SECRET_KEY_BASE}
@@ -36,14 +37,14 @@ services:
       - "127.0.0.1:${APP_UPSTREAM_PORT}:80"
 EOF
 
-cat > /etc/caddy/Caddyfile <<EOF
-https://${DOMAIN} {
-        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
-}
-EOF
+source /var/excloud/scripts/caddy-setup.sh
 
-echo "Caddyfile updated"
-
-systemctl enable caddy
-docker compose -f "${PLAUSIBLE_DIR}/compose.yml" -f "${OVERRIDE_FILE}" up -d
-systemctl reload caddy
+if is_app_ready "$PLAUSIBLE_DIR"; then
+    # Restart to pick up new domain from .env
+    docker compose -f "${PLAUSIBLE_DIR}/compose.yml" -f "${OVERRIDE_FILE}" up -d
+    switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$PLAUSIBLE_DIR"
+else
+    setup_initializing_page "$DOMAIN" "$APP_NAME" "$PLAUSIBLE_DIR"
+    docker compose -f "${PLAUSIBLE_DIR}/compose.yml" -f "${OVERRIDE_FILE}" up -d
+    wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$PLAUSIBLE_DIR" &
+fi

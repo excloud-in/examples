@@ -29,6 +29,7 @@ fi
 DATABASE_ROOT_PASSWORD="$(cat "${ROOT_PASSWORD_FILE}")"
 DATABASE_PASSWORD="$(cat "${DATABASE_PASSWORD_FILE}")"
 
+# Always rewrite .env with current domain
 cat > "${ENV_FILE}" <<EOF
 DOMAIN=${DOMAIN}
 DATABASE_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
@@ -44,14 +45,14 @@ services:
       - "127.0.0.1:${APP_UPSTREAM_PORT}:2368"
 EOF
 
-cat > /etc/caddy/Caddyfile <<EOF
-https://${DOMAIN} {
-        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
-}
-EOF
+source /var/excloud/scripts/caddy-setup.sh
 
-echo "Caddyfile updated"
-
-systemctl enable caddy
-docker compose -f "${GHOST_DIR}/compose.yml" -f "${OVERRIDE_FILE}" up -d db ghost
-systemctl reload caddy
+if is_app_ready "$GHOST_DIR"; then
+    # Restart to pick up new domain from .env
+    docker compose -f "${GHOST_DIR}/compose.yml" -f "${OVERRIDE_FILE}" up -d db ghost
+    switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$GHOST_DIR"
+else
+    setup_initializing_page "$DOMAIN" "$APP_NAME" "$GHOST_DIR"
+    docker compose -f "${GHOST_DIR}/compose.yml" -f "${OVERRIDE_FILE}" up -d db ghost
+    wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$GHOST_DIR" &
+fi

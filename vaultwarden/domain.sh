@@ -12,17 +12,18 @@ if [ -z "${DOMAIN}" ]; then
   exit 1
 fi
 
-URL="https://${DOMAIN}"
-COMPOSE_FILE="${APP_DIR}/${APP_NAME}/docker-compose.yml"
+VAULTWARDEN_DIR="${APP_DIR}/${APP_NAME}"
+COMPOSE_FILE="${VAULTWARDEN_DIR}/docker-compose.yml"
 
-cat > /etc/caddy/Caddyfile <<EOF
-${URL} {
-        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
-}
-EOF
+source /var/excloud/scripts/caddy-setup.sh
 
-echo "Caddyfile updated"
-
-systemctl enable caddy
-docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
-systemctl reload caddy
+if is_app_ready "$VAULTWARDEN_DIR"; then
+    # Update domain in docker-compose env vars
+    sed -i "s|DOMAIN: .*|DOMAIN: https://${DOMAIN}|" "${COMPOSE_FILE}"
+    docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+    switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$VAULTWARDEN_DIR"
+else
+    setup_initializing_page "$DOMAIN" "$APP_NAME" "$VAULTWARDEN_DIR"
+    docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+    wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$VAULTWARDEN_DIR" &
+fi

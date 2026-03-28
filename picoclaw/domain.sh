@@ -32,16 +32,13 @@ services:
       - "127.0.0.1:${APP_BRIDGE_PORT}:18790"
 EOF
 
-cd "${PICOCLAW_DIR}"
-docker compose -f docker/docker-compose.yml -f docker/compose.override.yml --profile launcher up -d
+source /var/excloud/scripts/caddy-setup.sh
 
-cat > /etc/caddy/Caddyfile <<EOF
-https://${DOMAIN} {
-        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
-}
-EOF
-
-echo "Caddyfile updated"
-
-systemctl enable caddy
-systemctl reload caddy
+if is_app_ready "$PICOCLAW_DIR"; then
+    switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$PICOCLAW_DIR"
+else
+    setup_initializing_page "$DOMAIN" "$APP_NAME" "$PICOCLAW_DIR"
+    cd "${PICOCLAW_DIR}"
+    docker compose -f docker/docker-compose.yml -f docker/compose.override.yml --profile launcher up -d
+    wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$PICOCLAW_DIR" &
+fi

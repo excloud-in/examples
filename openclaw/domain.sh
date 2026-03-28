@@ -44,20 +44,21 @@ OPENCLAW_GATEWAY_BIND=lan
 OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
 EOF
 
+source /var/excloud/scripts/caddy-setup.sh
+
 cd "${OPENCLAW_DIR}"
 rm -f "${LEGACY_OVERRIDE_FILE}"
-docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.mode local
-docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.bind lan
-docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.controlUi.allowedOrigins "[\"https://${DOMAIN}\",\"http://localhost:${APP_UPSTREAM_PORT}\",\"http://127.0.0.1:${APP_UPSTREAM_PORT}\"]" --strict-json
-docker compose -f docker-compose.yml up -d openclaw-gateway
 
-cat > /etc/caddy/Caddyfile <<EOF
-https://${DOMAIN} {
-        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
-}
-EOF
-
-echo "Caddyfile updated"
-
-systemctl enable caddy
-systemctl reload caddy
+if is_app_ready "$OPENCLAW_DIR"; then
+    # Update allowed origins for the new domain
+    docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.controlUi.allowedOrigins "[\"https://${DOMAIN}\",\"http://localhost:${APP_UPSTREAM_PORT}\",\"http://127.0.0.1:${APP_UPSTREAM_PORT}\"]" --strict-json
+    docker compose -f docker-compose.yml up -d openclaw-gateway
+    switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$OPENCLAW_DIR"
+else
+    setup_initializing_page "$DOMAIN" "$APP_NAME" "$OPENCLAW_DIR"
+    docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.mode local
+    docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.bind lan
+    docker compose run --rm --no-deps --entrypoint node openclaw-gateway dist/index.js config set gateway.controlUi.allowedOrigins "[\"https://${DOMAIN}\",\"http://localhost:${APP_UPSTREAM_PORT}\",\"http://127.0.0.1:${APP_UPSTREAM_PORT}\"]" --strict-json
+    docker compose -f docker-compose.yml up -d openclaw-gateway
+    wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$OPENCLAW_DIR" &
+fi

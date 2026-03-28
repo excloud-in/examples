@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5">
+    <title>APP_DISPLAY_NAME — Unavailable</title>
+    <style>
+        /* --- Reset & Base --- */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --surface: #0a0a0a;
+            --surface-raised: #111111;
+            --surface-border: #1a1a1a;
+            --text-primary: #e8e4df;
+            --text-secondary: #6b6560;
+            --text-dim: #3a3632;
+            --caution: #b5874f;
+            --caution-dim: rgba(181, 135, 79, 0.06);
+            --caution-border: rgba(181, 135, 79, 0.12);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+        }
+
+        /* --- Subtle noise/grain feel via dots --- */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at center, var(--surface-border) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.25;
+            mask-image: radial-gradient(ellipse 40% 40% at 50% 50%, black 10%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 40% 40% at 50% 50%, black 10%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* --- Main content --- */
+        .unavail-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            max-width: 520px;
+            width: 100%;
+        }
+
+        /* --- Pause indicator (two vertical bars — universal "paused" symbol) --- */
+        .pause-icon {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 2.5rem;
+            opacity: 0.85;
+        }
+
+        .pause-bar {
+            width: 6px;
+            height: 32px;
+            background: var(--caution);
+            border-radius: 2px;
+            animation: bar-fade 3s ease-in-out infinite;
+        }
+
+        .pause-bar:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bar-fade {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* --- Caution banner --- */
+        .caution-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            background: var(--caution-dim);
+            border: 1px solid var(--caution-border);
+            border-radius: 100px;
+            margin-bottom: 1.25rem;
+        }
+
+        .caution-badge-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--caution);
+            border-radius: 50%;
+        }
+
+        .caution-badge-text {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--caution);
+        }
+
+        /* --- Heading --- */
+        .heading {
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* --- Body copy --- */
+        .body-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 380px;
+        }
+
+        /* --- Status bar --- */
+        .status-bar {
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--surface-raised);
+            border: 1px solid var(--surface-border);
+            border-radius: 100px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--caution);
+            border-radius: 50%;
+            animation: status-blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes status-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+        }
+
+        /* --- Footer --- */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 480px) {
+            .unavail-container { padding: 1.5rem; }
+            .pause-bar { height: 26px; width: 5px; }
+            .pause-icon { margin-bottom: 2rem; }
+        }
+
+        /* --- Reduced motion --- */
+        @media (prefers-reduced-motion: reduce) {
+            .pause-bar, .status-dot {
+                animation: none;
+            }
+            .pause-bar { opacity: 0.8; }
+            .status-dot { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="unavail-container">
+        <div class="pause-icon">
+            <div class="pause-bar"></div>
+            <div class="pause-bar"></div>
+        </div>
+        <div class="caution-badge">
+            <div class="caution-badge-dot"></div>
+            <span class="caution-badge-text">Temporarily unavailable</span>
+        </div>
+        <h1 class="heading">APP_DISPLAY_NAME is taking a moment</h1>
+        <p class="body-text">The app is restarting or undergoing brief maintenance. It should be back shortly.</p>
+        <div class="status-bar">
+            <div class="status-dot"></div>
+            <span class="status-text">Recovering &mdash; this page refreshes automatically</span>
+        </div>
+    </div>
+    <footer class="footer">
+        <span class="footer-text">Powered by Excloud</span>
+    </footer>
+</body>
+</html>

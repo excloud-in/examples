@@ -54,20 +54,6 @@ sed -i \
   "${COMPOSE_FILE}"
 sed -i "s/\"8080:8080\"/\"127.0.0.1:${APP_UPSTREAM_PORT}:8080\"/" "${COMPOSE_FILE}"
 
-docker compose -f "${COMPOSE_FILE}" up -d
-
-start_time="$(date +%s)"
-while true; do
-  if curl -fsS "http://127.0.0.1:${APP_UPSTREAM_PORT}" >/dev/null 2>&1; then
-    break
-  fi
-
-  if [ $(( $(date +%s) - start_time )) -ge 900 ]; then
-    echo "ERPNext did not become ready in time" >&2
-    exit 1
-  fi
-
-  sleep 5
-done
-
 bash "${SCRIPT_DIR}/domain.sh" "${DOMAIN}"
+
+docker compose -f "${COMPOSE_FILE}" up -d

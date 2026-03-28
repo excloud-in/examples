@@ -12,17 +12,22 @@ if [ -z "${DOMAIN}" ]; then
   exit 1
 fi
 
-URL="https://${DOMAIN}"
-COMPOSE_FILE="${APP_DIR}/${APP_NAME}/docker-compose.yml"
+GITEA_DIR="${APP_DIR}/${APP_NAME}"
+COMPOSE_FILE="${GITEA_DIR}/docker-compose.yml"
 
-cat > /etc/caddy/Caddyfile <<EOF
-${URL} {
-        reverse_proxy 127.0.0.1:${APP_UPSTREAM_PORT}
-}
-EOF
+source /var/excloud/scripts/caddy-setup.sh
 
-echo "Caddyfile updated"
-
-systemctl enable caddy
-docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
-systemctl reload caddy
+if is_app_ready "$GITEA_DIR"; then
+    # Update domain in docker-compose env vars
+    sed -i \
+      -e "s|GITEA__server__ROOT_URL: .*|GITEA__server__ROOT_URL: https://${DOMAIN}/|" \
+      -e "s|GITEA__server__DOMAIN: .*|GITEA__server__DOMAIN: ${DOMAIN}|" \
+      -e "s|GITEA__server__SSH_DOMAIN: .*|GITEA__server__SSH_DOMAIN: ${DOMAIN}|" \
+      "${COMPOSE_FILE}"
+    docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+    switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$GITEA_DIR"
+else
+    setup_initializing_page "$DOMAIN" "$APP_NAME" "$GITEA_DIR"
+    docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans
+    wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$GITEA_DIR" &
+fi

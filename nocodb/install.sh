@@ -19,8 +19,9 @@ fi
 NOCODB_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${NOCODB_DIR}/docker-compose.yml"
 
-apt-get install -y caddy
 mkdir -p "${NOCODB_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$NOCODB_DIR"
 
 cat > "${COMPOSE_FILE}" <<EOF
 services:

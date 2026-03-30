@@ -19,8 +19,9 @@ fi
 N8N_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${N8N_DIR}/docker-compose.yml"
 
-apt-get install -y caddy
 mkdir -p "${N8N_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$N8N_DIR"
 
 cat > "${COMPOSE_FILE}" <<EOF
 services:

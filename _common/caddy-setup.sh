@@ -16,6 +16,14 @@
 
 SCRIPT_DIR_CADDY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+reload_or_start_caddy() {
+    if systemctl is-active --quiet caddy; then
+        systemctl reload caddy
+    else
+        systemctl enable --now caddy
+    fi
+}
+
 write_loading_pages() {
     local app_name="$1"
     local app_dir="$2"
@@ -48,8 +56,7 @@ https://${domain} {
 }
 EOF
 
-    systemctl enable caddy
-    systemctl reload caddy
+    reload_or_start_caddy
     echo "Caddy serving initializing page for ${app_name}"
 }
 
@@ -89,7 +96,7 @@ EOF
     fi
 
     touch "${app_dir}/.excloud/.ready"
-    systemctl reload caddy
+    reload_or_start_caddy
     echo "App is ready — Caddy switched to reverse proxy"
 }
 
@@ -119,7 +126,7 @@ https://${domain} {
 EOF
     fi
 
-    systemctl reload caddy
+    reload_or_start_caddy
     echo "Domain switched to ${domain}"
 }
 

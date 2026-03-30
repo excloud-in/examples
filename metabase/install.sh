@@ -19,8 +19,9 @@ fi
 METABASE_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${METABASE_DIR}/docker-compose.yml"
 
-apt-get install -y caddy
 mkdir -p "${METABASE_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$METABASE_DIR"
 
 cat > "${COMPOSE_FILE}" <<EOF
 services:

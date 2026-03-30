@@ -17,8 +17,13 @@ if [ -z "${DOMAIN}" ]; then
 fi
 
 OPENCLAW_DIR="${APP_DIR}/${APP_NAME}"
+BOOTSTRAP_DIR="${APP_DIR}/.${APP_NAME}-bootstrap"
 
-apt-get install -y caddy git openssl
+mkdir -p "${BOOTSTRAP_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$BOOTSTRAP_DIR"
+
+apt-get install -y git openssl
 
 if [ ! -d "${OPENCLAW_DIR}/.git" ]; then
   git clone "${REPO_URL}" "${OPENCLAW_DIR}"

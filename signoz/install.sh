@@ -18,12 +18,17 @@ fi
 
 JWT_SECRET=$(openssl rand -hex 16 | cut -c-32)
 SIGNOZ_DIR="${APP_DIR}/signoz"
+BOOTSTRAP_DIR="${APP_DIR}/.${APP_NAME}-bootstrap"
 STATE_DIR="${SIGNOZ_DIR}/.excloud"
 COMPOSE_FILE="${SIGNOZ_DIR}/deploy/docker/docker-compose.yaml"
 OTEL_SERVICE_PATH='.services["otel-collector"].ports'
 SIGNOZ_SERVICE_PATH=".services.signoz.ports"
 
-apt-get install -y caddy yq
+mkdir -p "${BOOTSTRAP_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$BOOTSTRAP_DIR"
+
+apt-get install -y yq
 
 if git -C "${SIGNOZ_DIR}" rev-parse 2>/dev/null; then
     echo "Git repo exists"

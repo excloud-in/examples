@@ -17,11 +17,16 @@ if [ -z "${DOMAIN}" ]; then
 fi
 
 ERPNEXT_DIR="${APP_DIR}/${APP_NAME}"
+BOOTSTRAP_DIR="${APP_DIR}/.${APP_NAME}-bootstrap"
 STATE_DIR="${ERPNEXT_DIR}/.excloud"
 COMPOSE_FILE="${ERPNEXT_DIR}/pwd.yml"
 ADMIN_PASSWORD_FILE="${STATE_DIR}/admin-password"
 
-apt-get install -y caddy git openssl
+mkdir -p "${BOOTSTRAP_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$BOOTSTRAP_DIR"
+
+apt-get install -y git openssl
 
 if git -C "${ERPNEXT_DIR}" rev-parse 2>/dev/null; then
   echo "Git repo exists"

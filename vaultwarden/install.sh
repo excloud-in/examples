@@ -19,8 +19,9 @@ fi
 VAULTWARDEN_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${VAULTWARDEN_DIR}/docker-compose.yml"
 
-apt-get install -y caddy
 mkdir -p "${VAULTWARDEN_DIR}"
+source /var/excloud/scripts/caddy-setup.sh
+setup_initializing_page "$DOMAIN" "$APP_NAME" "$VAULTWARDEN_DIR"
 
 cat > "${COMPOSE_FILE}" <<EOF
 services:

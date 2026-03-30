@@ -21,8 +21,6 @@ STATE_DIR="${ERPNEXT_DIR}/.excloud"
 COMPOSE_FILE="${ERPNEXT_DIR}/pwd.yml"
 ADMIN_PASSWORD_FILE="${STATE_DIR}/admin-password"
 
-apt-get install -y caddy git openssl
-
 if git -C "${ERPNEXT_DIR}" rev-parse 2>/dev/null; then
   echo "Git repo exists"
 else

@@ -18,7 +18,7 @@ fi
 
 OPENCLAW_DIR="${APP_DIR}/${APP_NAME}"
 
-apt-get install -y caddy git openssl
+
 
 if [ ! -d "${OPENCLAW_DIR}/.git" ]; then
   git clone "${REPO_URL}" "${OPENCLAW_DIR}"

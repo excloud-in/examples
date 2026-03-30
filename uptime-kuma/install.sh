@@ -19,7 +19,7 @@ fi
 UPTIME_KUMA_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${UPTIME_KUMA_DIR}/docker-compose.yml"
 
-apt-get install -y caddy
+
 mkdir -p "${UPTIME_KUMA_DIR}"
 
 cat > "${COMPOSE_FILE}" <<EOF

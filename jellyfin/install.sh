@@ -19,7 +19,6 @@ fi
 JELLYFIN_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${JELLYFIN_DIR}/docker-compose.yml"
 
-apt-get install -y caddy
 mkdir -p "${JELLYFIN_DIR}"
 mkdir -p /srv/media/movies /srv/media/shows /srv/media/music
 

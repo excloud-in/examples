@@ -25,7 +25,6 @@ mkdir -p "${BOOTSTRAP_DIR}"
 source /var/excloud/scripts/caddy-setup.sh
 setup_initializing_page "$DOMAIN" "$APP_NAME" "$BOOTSTRAP_DIR"
 
-apt-get install -y git openssl
 
 if [ ! -d "${PLAUSIBLE_DIR}/.git" ]; then
   git clone -b "${REPO_REF}" --single-branch "${REPO_URL}" "${PLAUSIBLE_DIR}"

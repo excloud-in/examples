@@ -23,7 +23,6 @@ mkdir -p "${BOOTSTRAP_DIR}"
 source /var/excloud/scripts/caddy-setup.sh
 setup_initializing_page "$DOMAIN" "$APP_NAME" "$BOOTSTRAP_DIR"
 
-apt-get install -y git
 
 if [ ! -d "${PICOCLAW_DIR}/.git" ]; then
   git clone "${REPO_URL}" "${PICOCLAW_DIR}"

@@ -26,7 +26,6 @@ mkdir -p "${BOOTSTRAP_DIR}"
 source /var/excloud/scripts/caddy-setup.sh
 setup_initializing_page "$DOMAIN" "$APP_NAME" "$BOOTSTRAP_DIR"
 
-apt-get install -y git openssl
 
 if git -C "${ERPNEXT_DIR}" rev-parse 2>/dev/null; then
   echo "Git repo exists"

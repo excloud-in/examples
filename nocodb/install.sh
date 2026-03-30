@@ -19,7 +19,7 @@ fi
 NOCODB_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${NOCODB_DIR}/docker-compose.yml"
 
-
+apt-get install -y caddy
 mkdir -p "${NOCODB_DIR}"
 
 cat > "${COMPOSE_FILE}" <<EOF

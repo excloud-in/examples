@@ -19,7 +19,7 @@ fi
 OPEN_WEBUI_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${OPEN_WEBUI_DIR}/docker-compose.yml"
 
-
+apt-get install -y caddy openssl
 mkdir -p "${OPEN_WEBUI_DIR}"
 
 WEBUI_SECRET_KEY="$(openssl rand -hex 32)"

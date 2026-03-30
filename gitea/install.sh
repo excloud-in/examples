@@ -19,6 +19,7 @@ fi
 GITEA_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${GITEA_DIR}/docker-compose.yml"
 
+apt-get install -y caddy
 mkdir -p "${GITEA_DIR}"
 
 cat > "${COMPOSE_FILE}" <<EOF

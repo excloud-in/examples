@@ -20,7 +20,7 @@ fi
 
 PLAUSIBLE_DIR="${APP_DIR}/${APP_NAME}"
 
-
+apt-get install -y caddy git openssl
 
 if [ ! -d "${PLAUSIBLE_DIR}/.git" ]; then
   git clone -b "${REPO_REF}" --single-branch "${REPO_URL}" "${PLAUSIBLE_DIR}"

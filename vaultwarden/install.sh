@@ -19,7 +19,7 @@ fi
 VAULTWARDEN_DIR="${APP_DIR}/${APP_NAME}"
 COMPOSE_FILE="${VAULTWARDEN_DIR}/docker-compose.yml"
 
-
+apt-get install -y caddy
 mkdir -p "${VAULTWARDEN_DIR}"
 
 cat > "${COMPOSE_FILE}" <<EOF

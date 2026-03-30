@@ -19,7 +19,7 @@ fi
 
 GHOST_DIR="${APP_DIR}/${APP_NAME}"
 
-
+apt-get install -y caddy git openssl
 
 if [ ! -d "${GHOST_DIR}/.git" ]; then
   git clone "${REPO_URL}" "${GHOST_DIR}"

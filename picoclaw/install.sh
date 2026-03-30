@@ -18,7 +18,7 @@ fi
 
 PICOCLAW_DIR="${APP_DIR}/${APP_NAME}"
 
-
+apt-get install -y caddy git
 
 if [ ! -d "${PICOCLAW_DIR}/.git" ]; then
   git clone "${REPO_URL}" "${PICOCLAW_DIR}"

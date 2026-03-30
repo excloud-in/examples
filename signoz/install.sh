@@ -23,7 +23,7 @@ COMPOSE_FILE="${SIGNOZ_DIR}/deploy/docker/docker-compose.yaml"
 OTEL_SERVICE_PATH='.services["otel-collector"].ports'
 SIGNOZ_SERVICE_PATH=".services.signoz.ports"
 
-
+apt-get install -y caddy yq
 
 if git -C "${SIGNOZ_DIR}" rev-parse 2>/dev/null; then
     echo "Git repo exists"

@@ -14,22 +14,50 @@ if [ -z "$DOMAIN" ]; then
 fi
 
 URL="https://${DOMAIN}"
-COMPOSE_FILE="${APP_DIR}/signoz/deploy/docker/docker-compose.yaml"
+SIGNOZ_DIR="${APP_DIR}/${APP_NAME}"
+STATE_DIR="${SIGNOZ_DIR}/.excloud"
+JWT_SECRET_FILE="${STATE_DIR}/jwt-secret"
+COMPOSE_FILE="${SIGNOZ_DIR}/pours/deployment/compose.yaml"
 
-set_env() {
-    local key="$1"
-    local value="$2"
-    local service_path="$3"
-    local env_pair="${key}=${value}"
+if [ ! -f "${JWT_SECRET_FILE}" ]; then
+    echo "SigNoz JWT secret not found: ${JWT_SECRET_FILE}" >&2
+    exit 1
+fi
 
-    if yq "${service_path}" "$COMPOSE_FILE" | grep -q "${key}="; then
-        yq -yi "(${service_path}[] | select(type == \"string\" and test(\"^${key}=\"))) = \"${env_pair}\"" "$COMPOSE_FILE"
-        echo "Replaced: ${env_pair}"
-    else
-        yq -yi "${service_path} += [\"${env_pair}\"]" "$COMPOSE_FILE"
-        echo "Added: ${env_pair}"
-    fi
-}
+JWT_SECRET=$(cat "${JWT_SECRET_FILE}")
+
+cd "${SIGNOZ_DIR}"
+cat > "${SIGNOZ_DIR}/casting.yaml" <<EOF
+apiVersion: v1alpha1
+kind: Installation
+metadata:
+  name: signoz
+spec:
+  deployment:
+    flavor: compose
+    mode: docker
+  signoz:
+    spec:
+      env:
+        SIGNOZ_TOKENIZER_JWT_SECRET: ${JWT_SECRET}
+        SIGNOZ_GLOBAL_EXTERNAL__URL: ${URL}
+        SIGNOZ_GLOBAL_INGESTION__URL: ${URL}
+        SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL__URL: ${URL}
+  patches:
+    - target: deployment/compose.yaml
+      operations:
+        - op: replace
+          path: /services/ingester/ports
+          value:
+            - "127.0.0.1:44317:4317"
+            - "127.0.0.1:44318:4318"
+        - op: replace
+          path: /services/signoz-signoz-0/ports
+          value:
+            - "127.0.0.1:${APP_UPSTREAM_PORT}:8080"
+EOF
+
+foundryctl forge -f "${SIGNOZ_DIR}/casting.yaml"
 
 source /var/excloud/scripts/caddy-setup.sh
 
@@ -53,15 +81,11 @@ ${URL}:4318 {
 }
 EOF
 
-set_env "SIGNOZ_GLOBAL_EXTERNAL_URL" "${URL}" ".services.signoz.environment"
-set_env "SIGNOZ_GLOBAL_INGESTION_URL" "${URL}" ".services.signoz.environment"
-set_env "SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL_URL" "${URL}" ".services.signoz.environment"
-
 if is_app_ready "$APP_DIR/$APP_NAME"; then
-    docker compose -f $COMPOSE_FILE up -d --remove-orphans
+    docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
     switch_domain "$DOMAIN" "$APP_UPSTREAM_PORT" "$APP_DIR/$APP_NAME" "$SIGNOZ_CADDYFILE"
 else
     setup_initializing_page "$DOMAIN" "$APP_NAME" "$APP_DIR/$APP_NAME"
-    docker compose -f $COMPOSE_FILE up -d --remove-orphans
+    docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
     wait_and_switch_to_proxy "$DOMAIN" "$APP_UPSTREAM_PORT" "$APP_DIR/$APP_NAME" "$SIGNOZ_CADDYFILE" &
 fi

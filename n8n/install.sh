@@ -26,7 +26,7 @@ setup_initializing_page "$DOMAIN" "$APP_NAME" "$N8N_DIR"
 cat > "${COMPOSE_FILE}" <<EOF
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:2.12.3
+    image: docker.n8n.io/n8nio/n8n:2.29.10
     restart: always
     ports:
       - "127.0.0.1:${APP_UPSTREAM_PORT}:5678"
